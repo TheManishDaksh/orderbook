@@ -1,49 +1,78 @@
 "use client"
+import { AreaSeries, createChart, ColorType } from 'lightweight-charts';
+import React, { useEffect, useRef } from 'react';
 
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import Script from "next/script";
+export const ChartComponent = (props : any) => {
+    const {
+        data,
+        colors: {
+            backgroundColor = 'black',
+            lineColor = '#2962FF',
+            textColor = 'white',
+            areaTopColor = '#2962FF',
+            areaBottomColor = 'rgba(41, 98, 255, 0.28)',
+        } = {},
+    } = props;
 
-import {
-  ChartingLibraryWidgetOptions,
-  ResolutionString,
-} from "charting_library";
+    // @ts-ignore
+    const chartContainerRef = useRef();
 
-const defaultWidgetProps: Partial<ChartingLibraryWidgetOptions> = {
-  symbol: "AAPL",
-  interval: "1D" as ResolutionString,
-  library_path: "/static/charting_library/",
-  locale: "en",
-  charts_storage_url: "https://saveload.tradingview.com",
-  charts_storage_api_version: "1.1",
-  client_id: "tradingview.com",
-  user_id: "public_user_id",
-  fullscreen: false,
-  autosize: true,
+    useEffect(
+        () => {
+            const handleResize = () => {
+                // @ts-ignore
+                chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+            };
+// @ts-ignore
+            const chart = createChart(chartContainerRef.current, {
+                layout: {
+                    background: { type: ColorType.Solid, color: backgroundColor },
+                    textColor,
+             
+                },
+             // @ts-ignore
+                width: 700,
+                height: 300,
+            });
+            chart.timeScale().fitContent();
+
+            const newSeries = chart.addSeries(AreaSeries, { lineColor, topColor: areaTopColor, bottomColor: areaBottomColor });
+            newSeries.setData(data);
+
+            window.addEventListener('resize', handleResize);
+
+            return () => {
+                window.removeEventListener('resize', handleResize);
+
+                chart.remove();
+            };
+        },
+        [data, backgroundColor, lineColor, textColor, areaTopColor, areaBottomColor]
+    );
+
+    return (
+        <div
+        // @ts-ignore
+            ref={chartContainerRef}
+        />
+    );
 };
 
-const ChartContainer = dynamic(
-  () =>
-    import("@/components/ChartContainer").then((mod) => mod.ChartContainer),
-  { ssr: false }
-);
+const initialData = [
+    { time: '2018-12-22', value: 32.51 },
+    { time: '2018-12-23', value: 31.11 },
+    { time: '2018-12-24', value: 27.02 },
+    { time: '2018-12-25', value: 27.32 },
+    { time: '2018-12-26', value: 25.17 },
+    { time: '2018-12-27', value: 28.89 },
+    { time: '2018-12-28', value: 25.46 },
+    { time: '2018-12-29', value: 23.92 },
+    { time: '2018-12-30', value: 22.68 },
+    { time: '2018-12-31', value: 22.67 },
+];
 
-export default function Chart() {
-  const [isScriptReady, setIsScriptReady] = useState(false);
-  return (
-    <>
-      <Head>
-        <title>TradingView Charting Library and Next.js</title>
-      </Head>
-      <Script
-        src="/static/datafeeds/udf/dist/bundle.js"
-        strategy="lazyOnload"
-        onReady={() => {
-          setIsScriptReady(true);
-        }}
-      />
-      {isScriptReady && <ChartContainer {...defaultWidgetProps} />}
-    </>
-  );
+export default function App(props :any) {
+    return (
+        <ChartComponent {...props} data={initialData}></ChartComponent>
+    );
 }

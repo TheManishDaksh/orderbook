@@ -1,12 +1,11 @@
 "use client"
 
-import styles from "./index.module.css";
 import { useRef, useEffect } from "react";
 import { ChartingLibraryWidgetOptions, ResolutionString, LanguageCode, widget } from "charting_library";
 
 export const ChartContainer = (props: Partial<ChartingLibraryWidgetOptions>) => {
 	const chartContainerRef =
-		useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
+		useRef<HTMLDivElement | null>(null); 
 
 	useEffect(() => {
 		const widgetOptions: ChartingLibraryWidgetOptions = {
@@ -21,7 +20,7 @@ export const ChartContainer = (props: Partial<ChartingLibraryWidgetOptions>) => 
 				}
 			),
 			interval: props.interval as ResolutionString,
-			container: chartContainerRef.current,
+			container_id: chartContainerRef.current!.id,
 			library_path: props.library_path,
 			locale: props.locale as LanguageCode,
 			disabled_features: ["use_localstorage_for_settings"],
@@ -67,7 +66,7 @@ export const ChartContainer = (props: Partial<ChartingLibraryWidgetOptions>) => 
 					TradingView Charting Library and Next.js Integration Example
 				</h1>
 			</header>
-			<div ref={chartContainerRef} className={styles.TVChartContainer} />
+			<div id="container" ref={chartContainerRef} className={styles.TVChartContainer} />
 		</>
 	);
 };

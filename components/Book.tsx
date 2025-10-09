@@ -5,7 +5,8 @@ interface bookProps{
 }
 export default function Book({indexValue}:bookProps) {
   return (
-    <div className="p-4 bg-gray-900 text-white rounded-2xl shadow-xl w-full max-w-md mx-auto">
+    <div className="p-4 bg-gray-900 text-white rounded-2xl shadow-xl w-full min-w-[300px]
+     mx-auto">
       <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
         <p className="text-lg font-semibold">Order Book</p>
         <p className="text-sm text-gray-400">Trade</p>
