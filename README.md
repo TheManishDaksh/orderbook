@@ -26,7 +26,7 @@ cd orderbook
 Install dependencies (if any):
 
 ```bash
-npm install
+bun install
 ```
 
 Start hacking away!
