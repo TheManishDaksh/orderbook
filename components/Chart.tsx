@@ -1,8 +1,49 @@
+"use client"
 
-export default function Chart(){
-    return(
-        <div>
-            Chart this will sh0ow my charts i will add it soon
-        </div>
-    )
+import Head from "next/head";
+import dynamic from "next/dynamic";
+import { useState } from "react";
+import Script from "next/script";
+
+import {
+  ChartingLibraryWidgetOptions,
+  ResolutionString,
+} from "charting_library";
+
+const defaultWidgetProps: Partial<ChartingLibraryWidgetOptions> = {
+  symbol: "AAPL",
+  interval: "1D" as ResolutionString,
+  library_path: "/static/charting_library/",
+  locale: "en",
+  charts_storage_url: "https://saveload.tradingview.com",
+  charts_storage_api_version: "1.1",
+  client_id: "tradingview.com",
+  user_id: "public_user_id",
+  fullscreen: false,
+  autosize: true,
+};
+
+const ChartContainer = dynamic(
+  () =>
+    import("@/components/ChartContainer").then((mod) => mod.ChartContainer),
+  { ssr: false }
+);
+
+export default function Chart() {
+  const [isScriptReady, setIsScriptReady] = useState(false);
+  return (
+    <>
+      <Head>
+        <title>TradingView Charting Library and Next.js</title>
+      </Head>
+      <Script
+        src="/static/datafeeds/udf/dist/bundle.js"
+        strategy="lazyOnload"
+        onReady={() => {
+          setIsScriptReady(true);
+        }}
+      />
+      {isScriptReady && <ChartContainer {...defaultWidgetProps} />}
+    </>
+  );
 }
